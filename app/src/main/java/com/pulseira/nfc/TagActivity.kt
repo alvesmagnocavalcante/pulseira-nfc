@@ -7,6 +7,7 @@ import android.content.Intent
 import android.nfc.NdefMessage
 import android.nfc.NdefRecord
 import android.nfc.NfcAdapter
+import android.nfc.Tag
 import android.os.Bundle
 import android.widget.Toast
 import java.nio.charset.Charset
@@ -29,9 +30,10 @@ class TagActivity : Activity() {
     }
 
     private fun tratar(i: Intent) {
-        val texto = lerTexto(i)
+        // Prefere o texto gravado; se não houver, usa o código (UID) da pulseira
+        val texto = lerTexto(i) ?: lerUid(i)
         if (texto.isNullOrEmpty()) {
-            Toast.makeText(this, "Pulseira sem texto legível", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Não consegui ler a pulseira", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
@@ -50,6 +52,15 @@ class TagActivity : Activity() {
             servico.colar(texto)
         }
         finish()
+    }
+
+    // UID em hexadecimal maiúsculo, sem separadores (ex.: 04A1B2C3)
+    @Suppress("DEPRECATION")
+    private fun lerUid(i: Intent): String? {
+        val id = i.getByteArrayExtra(NfcAdapter.EXTRA_ID)
+            ?: i.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG)?.id
+            ?: return null
+        return id.joinToString("") { "%02X".format(it) }
     }
 
     @Suppress("DEPRECATION")
