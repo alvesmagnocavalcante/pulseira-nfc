@@ -9,6 +9,7 @@ import android.nfc.NdefRecord
 import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Toast
 import java.nio.charset.Charset
 
@@ -40,6 +41,15 @@ class TagActivity : Activity() {
 
         val cm = getSystemService(ClipboardManager::class.java)
         cm.setPrimaryClip(ClipData.newPlainText("pulseira", texto))
+
+        // Se o teclado "Pulseira NFC" estiver selecionado, ele digita o texto
+        val metodo = Settings.Secure.getString(contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD)
+        val teclado = TecladoService.instancia
+        if (teclado != null && metodo?.startsWith(packageName) == true) {
+            teclado.digitar(texto)
+            finish()
+            return
+        }
 
         val servico = PasteService.instancia
         if (servico == null) {

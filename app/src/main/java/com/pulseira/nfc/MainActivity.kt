@@ -26,7 +26,10 @@ class MainActivity : Activity() {
             text = "1. Toque no botão abaixo e ative \"Pulseira NFC\" em Acessibilidade " +
                 "(apps instalados).\n\n" +
                 "2. Abra o formulário e toque no campo onde o texto deve entrar.\n\n" +
-                "3. Encoste a pulseira no tablet. O texto é colado no campo."
+                "3. Encoste a pulseira no tablet. O texto é colado no campo.\n\n" +
+                "Para RDP: ative o teclado \"Pulseira NFC\" (botão abaixo). Dentro da sessão, " +
+                "abra o teclado do cliente RDP, escolha \"Pulseira NFC\" em \"Trocar teclado\", " +
+                "clique no campo do Windows e encoste a pulseira."
         }
         status = TextView(this).apply {
             textSize = 18f
@@ -39,9 +42,17 @@ class MainActivity : Activity() {
             }
         }
 
+        val botaoTeclado = Button(this).apply {
+            text = "Ativar teclado Pulseira NFC (para RDP)"
+            setOnClickListener {
+                startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS))
+            }
+        }
+
         tela.addView(explicacao)
         tela.addView(status)
         tela.addView(botao)
+        tela.addView(botaoTeclado)
         setContentView(tela)
     }
 

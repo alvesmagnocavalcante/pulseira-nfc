@@ -40,6 +40,20 @@
             </intent-filter>
         </activity>
 
+        <!-- Teclado que digita o código da pulseira (para RDP e similares) -->
+        <service
+            android:name=".TecladoService"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_INPUT_METHOD">
+            <intent-filter>
+                <action android:name="android.view.InputMethod" />
+            </intent-filter>
+            <meta-data
+                android:name="android.view.im"
+                android:resource="@xml/metodo_teclado" />
+        </service>
+
         <!-- Cola o texto no campo que estiver em foco -->
         <service
             android:name=".PasteService"
