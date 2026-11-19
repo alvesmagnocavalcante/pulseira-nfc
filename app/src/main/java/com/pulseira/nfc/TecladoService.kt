@@ -4,7 +4,9 @@ import android.inputmethodservice.InputMethodService
 import android.os.Handler
 import android.os.Looper
 import android.view.Gravity
+import android.view.KeyCharacterMap
 import android.view.View
+import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.LinearLayout
@@ -43,6 +45,12 @@ class TecladoService : InputMethodService() {
                 LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
             )
             addView(Button(context).apply {
+                text = "Testar"
+                setOnClickListener {
+                    currentInputConnection?.let { enviar(it, "TESTE123") }
+                }
+            })
+            addView(Button(context).apply {
                 text = "Trocar teclado"
                 setOnClickListener {
                     getSystemService(InputMethodManager::class.java).showInputMethodPicker()
@@ -60,11 +68,22 @@ class TecladoService : InputMethodService() {
         handler.postDelayed({
             val ic = currentInputConnection
             if (ic != null) {
-                ic.commitText(texto, 1)
+                enviar(ic, texto)
             } else if (tentativa < 10) {
                 tentar(texto, tentativa + 1)
             }
         }, 250)
+    }
+
+    // Envia como teclas (como um teclado físico); se não der, usa commitText
+    private fun enviar(ic: InputConnection, texto: String) {
+        val eventos = KeyCharacterMap.load(KeyCharacterMap.VIRTUAL_KEYBOARD)
+            .getEvents(texto.toCharArray())
+        if (eventos == null) {
+            ic.commitText(texto, 1)
+        } else {
+            for (e in eventos) ic.sendKeyEvent(e)
+        }
     }
 
     companion object {
